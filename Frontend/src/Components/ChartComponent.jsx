@@ -37,14 +37,29 @@ const ChartComponent = () => {
                 // Sort the grouped data by date
                 const sortedData = Object.keys(groupedData).sort((a, b) => new Date(a) - new Date(b));
 
-                // Set the chart data
+                // Create separate datasets for energy saver on and off
+                const energySaverOnData = sortedData.map(date =>
+                    groupedData[date].algo_status === "1" ? groupedData[date].total_kwh : null
+                );
+                const energySaverOffData = sortedData.map(date =>
+                    groupedData[date].algo_status === "0" ? groupedData[date].total_kwh : null
+                );
+
+                // Set the chart data with two datasets
                 setChartData({
                     labels: sortedData,
                     datasets: [
                         {
-                            label: 'Energy Consumption (kWh)',
-                            data: sortedData.map(date => groupedData[date].total_kwh),
-                            backgroundColor: sortedData.map(date => groupedData[date].algo_status === "0" ? '#00e4ff' : '#419f98'),
+                            label: 'Energy Saver ON',
+                            data: energySaverOnData,
+                            backgroundColor: '#419f98',
+                            stack: 'Stack 0',
+                        },
+                        {
+                            label: 'Energy Saver OFF',
+                            data: energySaverOffData,
+                            backgroundColor: '#00e4ff',
+                            stack: 'Stack 0',
                         },
                     ],
                 });
@@ -74,6 +89,8 @@ const ChartComponent = () => {
         );
     }
 
+
+
     return (
         <div className="bg-blue-900 p-6 rounded-lg">
             <h2 className="text-2xl font-bold text-white mb-6">Energy Consumption by Date</h2>
@@ -82,14 +99,27 @@ const ChartComponent = () => {
                     ref={chartRef}
                     data={chartData}
                     options={{
+                        responsive: true,
                         plugins: {
                             title: {
                                 display: true,
                                 text: 'Energy Consumption by Date',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
                             },
-                        },
-                        legend: {
-                            display: false,
+                            
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        if (context.raw !== null) {
+                                            return `${context.dataset.label}: ${context.raw.toFixed(2)} kWh`;
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
                         },
                         scales: {
                             x: {
@@ -100,8 +130,8 @@ const ChartComponent = () => {
                                 },
                                 ticks: {
                                     autoSkip: true,
-                                    maxRotation: 45,
-                                    minRotation: 30,
+                                    maxRotation: 0,
+                                    minRotation: 0,
                                 },
                             },
                             y: {
@@ -110,6 +140,7 @@ const ChartComponent = () => {
                                     display: true,
                                     text: 'Energy Consumption (kWh)',
                                 },
+                                beginAtZero: true
                             },
                         },
                     }}
