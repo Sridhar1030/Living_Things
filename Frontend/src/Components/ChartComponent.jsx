@@ -89,8 +89,6 @@ const ChartComponent = () => {
         );
     }
 
-
-
     return (
         <div className="bg-blue-900 p-6 rounded-lg">
             <h2 className="text-2xl font-bold text-white mb-6">Energy Consumption by Date</h2>
@@ -109,7 +107,6 @@ const ChartComponent = () => {
                                     weight: 'bold'
                                 }
                             },
-                            
                             tooltip: {
                                 callbacks: {
                                     label: function (context) {
@@ -119,6 +116,9 @@ const ChartComponent = () => {
                                         return '';
                                     }
                                 }
+                            },
+                            legend: {
+                                display: false, // Disable the legend
                             }
                         },
                         scales: {
