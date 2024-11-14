@@ -4,13 +4,13 @@ import {
 	getFilteredChartData,
 	importChartData,
 } from "../controllers/chartController.js";
-import auth from "../middleware/auth.js";
+import { verifyJWT } from "../middleware/auth.middlewares.js";
 
 const router = express.Router();
 
 router.get("/",  getChartData);
-router.post("/import", importChartData);
-router.get('/filtered', getFilteredChartData);
+router.post("/import",verifyJWT, importChartData);
+router.get('/filtered',verifyJWT , getFilteredChartData);
 
 
 export default router;
