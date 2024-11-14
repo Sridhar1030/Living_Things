@@ -21,3 +21,13 @@ export const saveLog = async (req, res) => {
 		res.status(500).json({ error: error.message });
 	}
 };
+
+
+export const getLogs = async (req, res) => {
+	try {
+		const logs = await Log.find().sort({ accessTime: 1 }); // Sort by accessTime in ascending order
+		res.status(200).json(logs);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};

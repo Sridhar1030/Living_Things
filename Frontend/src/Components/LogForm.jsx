@@ -6,6 +6,8 @@ const LogForm = () => {
     const [accessTime, setAccessTime] = useState(new Date().toLocaleTimeString());
     const [accessDate, setAccessDate] = useState(new Date().toLocaleDateString());
     const [employeeName, setEmployeeName] = useState('');
+    const [energySavingMode, setEnergySavingMode] = useState('Energy Saving Mode OFF');
+
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -13,13 +15,16 @@ const LogForm = () => {
         e.preventDefault();
         setLoading(true);
 
-        const formData = { accessTime, accessDate, employeeName };
+        // Set algoStatus based on energySavingMode
+        const algoStatus = energySavingMode === 'Energy Saving Mode ON' ? 1 : 0;
+
+        const formData = { accessTime, accessDate, employeeName, algoStatus };
 
         axios.post('http://localhost:3000/api/logs', formData)
             .then((response) => {
                 setLoading(false);
                 alert('Log saved successfully');
-                navigate(`/filtered-data?algo_status=0`);
+                navigate(`/filtered-data?algoStatus=${algoStatus}`);
             })
             .catch((error) => {
                 setLoading(false);
@@ -32,7 +37,6 @@ const LogForm = () => {
         <div className="bg-blue-900 text-white p-8 rounded-lg shadow-lg">
             <h2 className="text-2xl font-bold mb-6">Employee Access Log</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-                
                 <div>
                     <label className="block font-medium mb-1">Employee Name</label>
                     <input
@@ -42,6 +46,17 @@ const LogForm = () => {
                         className="bg-white text-blue-900 p-2 rounded-md w-full"
                         required
                     />
+                </div>
+                <div>
+                    <label className="block font-medium mb-1">Energy Saving Mode</label>
+                    <select
+                        value={energySavingMode}
+                        onChange={(e) => setEnergySavingMode(e.target.value)}
+                        className="bg-white text-blue-900 p-2 rounded-md w-full"
+                    >
+                        <option>Energy Saving Mode ON</option>
+                        <option>Energy Saving Mode OFF</option>
+                    </select>
                 </div>
                 <button
                     type="submit"
