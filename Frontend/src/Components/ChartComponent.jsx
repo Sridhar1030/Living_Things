@@ -1,33 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import axios from 'axios';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const ChartComponent = () => {
     const [chartData, setChartData] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get('http://localhost:3000/api/chart-data')
+        axios.get('http://localhost:3000/api/charts')
             .then(response => {
                 const data = response.data;
                 setChartData({
-                    labels: data.map(item => new Date(item.createdAt.$date).toLocaleDateString()),
+                    labels: data.map(item => new Date(item.createdAt).toLocaleDateString()),
                     datasets: [{
                         label: 'Energy Consumption (kWh)',
                         data: data.map(item => item.total_kwh),
-                        borderColor: '#FFA500', // Orange
                         backgroundColor: '#FFA500',
-                        fill: false,
                     }],
                 });
                 setLoading(false);
-                console.log(data.map(item => item.createdAt.$date));
             })
-            .catch(err => console.error(err));
-            //clg create at
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
     }, []);
 
     if (loading) {
@@ -40,9 +39,9 @@ const ChartComponent = () => {
 
     return (
         <div className="bg-blue-900 text-white p-8 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-6">Energy Consumption vs Date</h2>
+            <h2 className="text-2xl font-bold mb-6">Energy Consumption by Date</h2>
             <div className="bg-white p-6 rounded-lg shadow-lg">
-                <Line
+                <Bar
                     data={chartData}
                     options={{
                         plugins: {
