@@ -23,12 +23,33 @@ const FilteredDataPage = () => {
         })
             .then((response) => {
                 const data = response.data;
+
+                // Group and sum data by date
+                const dateGroups = data.reduce((groups, item) => {
+                    const date = new Date(item.createdAt).toLocaleDateString();
+                    if (!groups[date]) {
+                        groups[date] = {
+                            total_kwh: 0,
+                            algo_status: item.algo_status
+                        };
+                    }
+                    groups[date].total_kwh += item.total_kwh;
+                    return groups;
+                }, {});
+
+                // Convert grouped data to arrays for chart
+                const dates = Object.keys(dateGroups);
+                const values = dates.map(date => dateGroups[date].total_kwh);
+                const statuses = dates.map(date => dateGroups[date].algo_status);
+
                 setChartData({
-                    labels: data.map(item => new Date(item.createdAt).toLocaleDateString()),
+                    labels: dates,
                     datasets: [{
                         label: 'Energy Consumption (kWh)',
-                        data: data.map(item => item.total_kwh),
-                        backgroundColor: data.map(item => item.algo_status === '0' ? '#00e4ff' : '#419f98'),
+                        data: values,
+                        backgroundColor: statuses.map(status =>
+                            status === '0' ? '#00e4ff' : '#419f98'
+                        ),
                     }],
                 });
                 setAlgoStatus(status);
