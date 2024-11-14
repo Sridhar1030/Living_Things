@@ -9,7 +9,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
 const ChartComponent = () => {
     const [chartData, setChartData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const chartRef = React.useRef(null); // Using ref to track the chart instance
+    const chartRef = React.useRef(null);
 
     useEffect(() => {
         axios.get('http://localhost:3000/api/charts')
@@ -57,55 +57,64 @@ const ChartComponent = () => {
 
         return () => {
             if (chartRef.current) {
-                chartRef.current.destroy(); // Properly destroy the chart when component unmounts
+                chartRef.current.destroy();
             }
         };
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] bg-blue-900 rounded-lg">
+                <div className="relative">
+                    <div className="w-12 h-12 border-4 border-orange-500 rounded-full animate-pulse"></div>
+                    <div className="w-12 h-12 border-4 border-transparent border-t-blue-400 rounded-full animate-spin absolute top-0"></div>
+                </div>
+                <p className="mt-4 text-white text-lg font-medium">Loading Chart Data...</p>
+            </div>
+        );
     }
 
     return (
-        <div>
-            <h2>Energy Consumption by Date</h2>
-            <Bar
-                ref={chartRef}
-                data={chartData}
-                options={{
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Energy Consumption by Date',
-                        },
-                    },
-                    legend: {
-                        display: false, // Hide the legend
-                    },
-                    scales: {
-                        x: {
-                            type: 'category',
+        <div className="bg-blue-900 p-6 rounded-lg">
+            <h2 className="text-2xl font-bold text-white mb-6">Energy Consumption by Date</h2>
+            <div className="bg-white p-4 rounded-lg">
+                <Bar
+                    ref={chartRef}
+                    data={chartData}
+                    options={{
+                        plugins: {
                             title: {
                                 display: true,
-                                text: 'Date',
-                            },
-                            ticks: {
-                                // You can adjust how the ticks appear
-                                autoSkip: true,
-                                maxRotation: 45, // Rotate labels if needed
-                                minRotation: 30,
+                                text: 'Energy Consumption by Date',
                             },
                         },
-                        y: {
-                            type: 'linear',
-                            title: {
-                                display: true,
-                                text: 'Energy Consumption (kWh)',
+                        legend: {
+                            display: false,
+                        },
+                        scales: {
+                            x: {
+                                type: 'category',
+                                title: {
+                                    display: true,
+                                    text: 'Date',
+                                },
+                                ticks: {
+                                    autoSkip: true,
+                                    maxRotation: 45,
+                                    minRotation: 30,
+                                },
+                            },
+                            y: {
+                                type: 'linear',
+                                title: {
+                                    display: true,
+                                    text: 'Energy Consumption (kWh)',
+                                },
                             },
                         },
-                    },
-                }}
-            />
+                    }}
+                />
+            </div>
         </div>
     );
 };

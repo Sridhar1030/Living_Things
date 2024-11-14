@@ -26,7 +26,7 @@ const LogTable = () => {
     }
 
     return (
-        <div className="bg-blue-900 min-h-screen p-8">
+        <div className="bg-blue-400 min-h-screen p-8">
             <div className="max-w-7xl mx-auto">
                 <h2 className="text-2xl font-bold mb-6 text-white">Chart Access Logs</h2>
                 <div className="overflow-x-auto rounded-lg shadow-xl text-black">

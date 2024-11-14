@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
 import { useLocation } from 'react-router-dom';
 
@@ -8,67 +7,73 @@ const FilteredDataPage = () => {
     const [algoStatus, setAlgoStatus] = useState(null);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [isFormValid, setIsFormValid] = useState(false);
     const location = useLocation();
 
     const queryParams = new URLSearchParams(location.search);
     const initialAlgoStatus = queryParams.get('algo_status');
 
     useEffect(() => {
-        fetchChartData(initialAlgoStatus, startDate, endDate);
+        // Check if we have either query params or form data
+        const hasQueryParams = initialAlgoStatus !== null;
+        const hasFormData = startDate && endDate;
+        setIsFormValid(hasQueryParams || hasFormData);
+
+        if (hasQueryParams || hasFormData) {
+            fetchChartData(initialAlgoStatus, startDate, endDate);
+        }
     }, [initialAlgoStatus, startDate, endDate]);
 
-    const fetchChartData = (status, start, end) => {
-        axios.get('http://localhost:3000/api/charts', {
-            params: {
+    const fetchChartData = async (status, start, end) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/charts?${new URLSearchParams({
                 algo_status: status,
                 start_date: start,
                 end_date: end
-            },
-        })
-            .then((response) => {
-                const data = response.data;
+            })}`);
 
-                // Filter data by date range if dates are selected
-                const filteredData = data.filter(item => {
-                    const itemDate = new Date(item.createdAt);
-                    const isAfterStart = !start || itemDate >= new Date(start);
-                    const isBeforeEnd = !end || itemDate <= new Date(end);
-                    return isAfterStart && isBeforeEnd;
-                });
+            const data = await response.json();
 
-                // Group and sum data by date
-                const dateGroups = filteredData.reduce((groups, item) => {
-                    const date = new Date(item.createdAt).toLocaleDateString();
-                    if (!groups[date]) {
-                        groups[date] = {
-                            total_kwh: 0,
-                            algo_status: item.algo_status
-                        };
-                    }
-                    groups[date].total_kwh += item.total_kwh;
-                    return groups;
-                }, {});
-
-                // Convert grouped data to arrays for chart
-                const dates = Object.keys(dateGroups);
-                const values = dates.map(date => dateGroups[date].total_kwh);
-                const statuses = dates.map(date => dateGroups[date].algo_status);
-
-                setChartData({
-                    labels: dates,
-                    datasets: [{
-                        label: 'Energy Consumption (kWh)',
-                        data: values,
-                        backgroundColor: statuses.map(status =>
-                            status === '0' ? '#00e4ff' : '#419f98'
-                        ),
-                    }],
-                });
-                setAlgoStatus(status);
-            })
-            .catch((error) => {
-                console.error(error);
+            // Filter data by date range if dates are selected
+            const filteredData = data.filter(item => {
+                const itemDate = new Date(item.createdAt);
+                const isAfterStart = !start || itemDate >= new Date(start);
+                const isBeforeEnd = !end || itemDate <= new Date(end);
+                return isAfterStart && isBeforeEnd;
             });
+
+            // Group and sum data by date
+            const dateGroups = filteredData.reduce((groups, item) => {
+                const date = new Date(item.createdAt).toLocaleDateString();
+                if (!groups[date]) {
+                    groups[date] = {
+                        total_kwh: 0,
+                        algo_status: item.algo_status
+                    };
+                }
+                groups[date].total_kwh += item.total_kwh;
+                return groups;
+            }, {});
+
+            // Convert grouped data to arrays for chart
+            const dates = Object.keys(dateGroups);
+            const values = dates.map(date => dateGroups[date].total_kwh);
+            const statuses = dates.map(date => dateGroups[date].algo_status);
+
+            setChartData({
+                labels: dates,
+                datasets: [{
+                    label: 'Energy Consumption (kWh)',
+                    data: values,
+                    backgroundColor: statuses.map(status =>
+                        status === '0' ? '#00e4ff' : '#419f98'
+                    ),
+                }],
+            });
+            setAlgoStatus(status);
+        } catch (error) {
+            console.error('Error fetching chart data:', error);
+        }
     };
 
     const handleAlgoStatusChange = () => {
@@ -86,11 +91,13 @@ const FilteredDataPage = () => {
     };
 
     return (
-        <div className="bg-blue-900 text-white p-8 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-6">Filtered Energy Consumption Chart</h2>
+        <div className="bg-slate-900 text-white p-8 rounded-lg shadow-lg">
+            <div className="mb-6">
+                <h2 className="text-2xl font-bold">Filtered Energy Consumption Chart</h2>
+            </div>
 
             {/* Date filters */}
-            <div className="flex gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <div>
                     <label htmlFor="startDate" className="block mb-2">Start Date:</label>
                     <input
@@ -115,52 +122,57 @@ const FilteredDataPage = () => {
                 </div>
             </div>
 
-            <button
-                className="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-md mb-6"
-                onClick={handleAlgoStatusChange}
-            >
-                {algoStatus === '0' ? 'Turn Energy Saving On' : 'Turn Energy Saving Off'}
-            </button>
+            {!isFormValid && (
+                <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/50 rounded-lg">
+                    <p className="text-yellow-500">
+                        Please fill in both start and end dates to view the energy consumption data.
+                    </p>
+                </div>
+            )}
 
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-                {chartData && (
-                    <Bar
-                        data={chartData}
-                        options={{
-                            plugins: {
-                                title: {
-                                    display: false,
-                                },
-                                legend: {
-                                    display: true,
-                                    position: 'bottom',
-                                    labels: {
-                                        fontColor: '#FFA500',
+            {isFormValid && (
+                <>
+                    <button
+                        className="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-md mb-6"
+                        onClick={handleAlgoStatusChange}
+                    >
+                        {algoStatus === '0' ? 'Turn Energy Saving On' : 'Turn Energy Saving Off'}
+                    </button>
+
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        {chartData && (
+                            <Bar
+                                data={chartData}
+                                options={{
+                                    responsive: true,
+                                    plugins: {
+                                        title: {
+                                            display: false,
+                                        },
+                                        legend: {
+                                            display: true,
+                                            position: 'bottom',
+                                        },
                                     },
-                                },
-                            },
-                            scales: {
-                                x: {
-                                    grid: {
-                                        color: '#FFA500',
+                                    scales: {
+                                        x: {
+                                            grid: {
+                                                display: true,
+                                            },
+                                        },
+                                        y: {
+                                            grid: {
+                                                display: true,
+                                            },
+                                            beginAtZero: true,
+                                        },
                                     },
-                                    ticks: {
-                                        fontColor: '#FFA500',
-                                    },
-                                },
-                                y: {
-                                    grid: {
-                                        color: '#FFA500',
-                                    },
-                                    ticks: {
-                                        fontColor: '#FFA500',
-                                    },
-                                },
-                            },
-                        }}
-                    />
-                )}
-            </div>
+                                }}
+                            />
+                        )}
+                    </div>
+                </>
+            )}
         </div>
     );
 };
