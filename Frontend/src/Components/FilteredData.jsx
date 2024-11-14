@@ -1,49 +1,60 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Line } from 'react-chartjs-2';
-import { useLocation } from 'react-router-dom';  // To read query parameters
+import { Bar } from 'react-chartjs-2';
+import { useLocation } from 'react-router-dom';
 
 const FilteredDataPage = () => {
     const [chartData, setChartData] = useState(null);
+    const [algoStatus, setAlgoStatus] = useState(null);
     const location = useLocation();
 
     const queryParams = new URLSearchParams(location.search);
-    const accessDate = queryParams.get('date');
-    const algoStatus = queryParams.get('algo_status');
+    const initialAlgoStatus = queryParams.get('algo_status');
 
     useEffect(() => {
-        // Fetch filtered chart data based on query parameters
+        fetchChartData(initialAlgoStatus);
+    }, [initialAlgoStatus]);
+
+    const fetchChartData = (status) => {
         axios.get('http://localhost:3000/api/charts', {
             params: {
-                date: accessDate,
-                algo_status: algoStatus,
-            }
+                algo_status: status,
+            },
         })
             .then((response) => {
                 const data = response.data;
-
                 setChartData({
                     labels: data.map(item => new Date(item.createdAt).toLocaleDateString()),
                     datasets: [{
                         label: 'Energy Consumption (kWh)',
                         data: data.map(item => item.total_kwh),
-                        borderColor: '#FFA500',
-                        backgroundColor: '#FFA500',
-                        fill: false,
+                        backgroundColor: data.map(item => item.algo_status === '0' ? '#00e4ff' : '#419f98'),
                     }],
                 });
+                setAlgoStatus(status);
             })
             .catch((error) => {
                 console.error(error);
             });
-    }, [accessDate, algoStatus]);
+    };
+
+    const handleAlgoStatusChange = () => {
+        const newStatus = algoStatus === '0' ? '1' : '0';
+        fetchChartData(newStatus);
+    };
 
     return (
         <div className="bg-blue-900 text-white p-8 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-6">Filtered Chart Data</h2>
+            <h2 className="text-2xl font-bold mb-6">Filtered Energy Consumption Chart</h2>
+            <button
+                className="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-md mb-6"
+                onClick={handleAlgoStatusChange}
+            >
+                {algoStatus === '0' ? 'Turn Energy Saving On' : 'Turn Energy Saving Off'}
+            </button>
             <div className="bg-white p-6 rounded-lg shadow-lg">
                 {chartData && (
-                    <Line
+                    <Bar
                         data={chartData}
                         options={{
                             plugins: {

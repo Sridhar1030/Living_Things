@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import ChartComponent from './Components/ChartComponent';
 import LogForm from './Components/LogForm';
 import FilteredDataPage from './Components/FilteredData';  // Assuming you have a page for displaying filtered data
@@ -10,7 +10,9 @@ const App = () => {
   return (
     <Router>
       <div className="bg-gray-900 text-white min-h-screen p-8">
+        <Link to = "/">
         <h1 className="text-3xl font-bold mb-6">Analytics Dashboard</h1>
+        </Link>
 
         <Routes>
           {/* Default Route - Main Dashboard Page */}
