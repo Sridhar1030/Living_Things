@@ -1,8 +1,21 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+// Load environment variables from .env file
+dotenv.config();
 
 const connectDB = async () => {
 	try {
-		await mongoose.connect("mongodb://localhost:27017/analytics", {
+		// Use the MONGO_URI from environment variables
+		const mongoURI = process.env.MONGO_URI;
+		if (!mongoURI) {
+			console.error(
+				"MONGO_URI is not defined in the environment variables"
+			);
+			return;
+		}
+
+		await mongoose.connect(mongoURI, {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		});
