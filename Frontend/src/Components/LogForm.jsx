@@ -14,13 +14,14 @@ const LogForm = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
+        const API_URL = import.meta.env.VITE_API_URL;
 
         // Set algoStatus based on energySavingMode
         const algoStatus = energySavingMode === 'Energy Saving Mode ON' ? 1 : 0;
 
         const formData = { accessTime, accessDate, employeeName, algoStatus };
 
-        axios.post('http://localhost:3000/api/logs', formData)
+        axios.post(`${API_URL}/logs`, formData)
             .then((response) => {
                 setLoading(false);
                 alert('Log saved successfully');

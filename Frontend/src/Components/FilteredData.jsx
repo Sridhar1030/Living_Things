@@ -9,6 +9,7 @@ const FilteredDataPage = () => {
     const [endDate, setEndDate] = useState('');
     const [isFormValid, setIsFormValid] = useState(false);
     const location = useLocation();
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const queryParams = new URLSearchParams(location.search);
     const initialAlgoStatus = queryParams.get('algo_status');
@@ -26,7 +27,7 @@ const FilteredDataPage = () => {
 
     const fetchChartData = async (status, start, end) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/charts?${new URLSearchParams({
+            const response = await fetch(`${API_URL}charts?${new URLSearchParams({
                 algo_status: status,
                 start_date: start,
                 end_date: end

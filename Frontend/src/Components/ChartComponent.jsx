@@ -5,6 +5,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 
 // Register necessary chart components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement);
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ChartComponent = () => {
     const [chartData, setChartData] = useState(null);
@@ -12,7 +13,7 @@ const ChartComponent = () => {
     const chartRef = React.useRef(null);
 
     useEffect(() => {
-        axios.get('http://localhost:3000/api/charts')
+        axios.get(`${API_URL}/charts`)
             .then(response => {
                 const data = response.data;
 

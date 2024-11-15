@@ -4,9 +4,10 @@ import axios from 'axios';
 const LogTable = () => {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
-        axios.get('http://localhost:3000/api/logs')
+        axios.get(`${API_URL}/logs`)
             .then(response => {
                 setLogs(response.data);
                 setLoading(false);
