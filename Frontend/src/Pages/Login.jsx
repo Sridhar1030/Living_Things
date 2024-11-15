@@ -6,28 +6,27 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
     const [emailOrUsername, setEmailOrUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false); // Add loading state
+    const [loading, setLoading] = useState(false); 
     const { error } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setLoading(true); // Set loading to true when form is submitted
-
+        setLoading(true); 
         const credentials = {
             email: emailOrUsername.includes('@') ? emailOrUsername : undefined,
             username: !emailOrUsername.includes('@') ? emailOrUsername : undefined,
             password,
         };
 
-        dispatch(loginUser(credentials)) // Dispatch login action
+        dispatch(loginUser(credentials)) 
             .then(() => {
-                setLoading(false); // Set loading to false after successful login
-                navigate('/dashboard'); // Navigate to dashboard on success
+                setLoading(false); 
+                navigate('/dashboard'); 
             })
             .catch((err) => {
-                setLoading(false); // Set loading to false if there is an error
+                setLoading(false); 
             });
     };
 
