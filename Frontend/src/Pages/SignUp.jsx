@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { signupUser } from '../redux/actions/authActions';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
@@ -9,28 +10,14 @@ const Signup = () => {
         username: '',
         password: '',
     });
-    const [error, setError] = useState('');
+    const { error } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setError('');
-
-        try {
-            const response = await axios.post('http://localhost:3000/api/auth/signup', formData);
-            localStorage.setItem('accessToken', response.data.accessToken);
-            navigate('/dashboard');
-        } catch (err) {
-            setError(err.response?.data?.message || 'Signup failed. Please try again.');
-        }
+        dispatch(signupUser(formData));
+        navigate('/dashboard');
     };
 
     return (

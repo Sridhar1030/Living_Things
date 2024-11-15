@@ -1,28 +1,27 @@
 // Login.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../redux/actions/authActions';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [emailOrUsername, setEmailOrUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const { error } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        try {
-            const response = await axios.post('http://localhost:3000/api/auth/login', {
-                email: emailOrUsername,
-                username: !emailOrUsername.includes('@') ? emailOrUsername : undefined,
-                password,
-            });
-            localStorage.setItem('accessToken', response.data.accessToken);
-            navigate('/dashboard');
-        } catch (err) {
-            setError(err.response ? err.response.data.message : 'Login failed');
-        }
+        const credentials = {
+            email: emailOrUsername.includes('@') ? emailOrUsername : undefined,
+            username: !emailOrUsername.includes('@') ? emailOrUsername : undefined,
+            password,
+        };
+        dispatch(loginUser(credentials));
+        navigate('/dashboard');
     };
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
