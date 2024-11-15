@@ -24,10 +24,8 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        // Clear localStorage
         localStorage.clear();
 
-        // Redirect to the homepage ("/")
         navigate('/');
     };
 

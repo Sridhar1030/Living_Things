@@ -29,7 +29,6 @@ const FilteredDataPage = () => {
             .then((response) => {
                 const data = response.data;
 
-                // Filter data by date range if dates are selected
                 const filteredData = data.filter(item => {
                     const itemDate = new Date(item.createdAt);
                     const isAfterStart = !start || itemDate >= new Date(start);
@@ -37,7 +36,6 @@ const FilteredDataPage = () => {
                     return isAfterStart && isBeforeEnd;
                 });
 
-                // Group and sum data by date
                 const dateGroups = filteredData.reduce((groups, item) => {
                     const date = new Date(item.createdAt).toLocaleDateString();
                     if (!groups[date]) {
@@ -50,7 +48,6 @@ const FilteredDataPage = () => {
                     return groups;
                 }, {});
 
-                // Convert grouped data to arrays for chart
                 const dates = Object.keys(dateGroups);
                 const values = dates.map(date => dateGroups[date].total_kwh);
                 const statuses = dates.map(date => dateGroups[date].algo_status);

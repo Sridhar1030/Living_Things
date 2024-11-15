@@ -44,31 +44,30 @@ export const getChartData = async (req, res) => {
 
 export const getFilteredChartData = async (req, res) => {
     try {
-        // Check if the database is empty
+        
         const existingData = await ChartData.countDocuments();
         
-        // If no data exists, import the data from the JSON file
+        
         if (existingData === 0) {
             console.log('No data found, importing chart data...');
-            await importChartData(req, res); // Call the import function
+            await importChartData(req, res); 
         }
 
-        // After ensuring data is in the database, filter by algo_status
+        
         const { algo_status, start_date, end_date } = req.query;
 
         const filter = {
-            ...(algo_status && { algo_status: parseInt(algo_status) }) // Filter by algo_status
+            ...(algo_status && { algo_status: parseInt(algo_status) }) 
         };
 
-        // If date filters are provided, add them to the filter
         if (start_date && end_date) {
             filter.createdAt = {
-                $gte: new Date(start_date), // Start date
-                $lte: new Date(end_date)    // End date
+                $gte: new Date(start_date),
+                $lte: new Date(end_date)   
             };
         }
 
-        // Fetch filtered data
+        
         const data = await ChartData.find(filter);
 
         res.json(data);
@@ -79,21 +78,18 @@ export const getFilteredChartData = async (req, res) => {
 
 export const importChartData = async (req, res) => {
 	try {
-		// Define the path to your chartData.json file
+		
 		const filePath = path.join(process.cwd(), 'chartData.json');
 		
-		// Read and parse the JSON data
 		const jsonData = await fs.readFile(filePath, 'utf8');
 		let chartDataArray = JSON.parse(jsonData);
 
-		// Convert date and ObjectId fields
 		chartDataArray = chartDataArray.map(data => ({
 			...data,
-			createdAt: new Date(data.createdAt["$date"]),  // Convert to JavaScript Date
-			_id: data._id ? new mongoose.Types.ObjectId(data._id["$oid"]) : undefined  // Convert to ObjectId if present
+			createdAt: new Date(data.createdAt["$date"]),  
+			_id: data._id ? new mongoose.Types.ObjectId(data._id["$oid"]) : undefined  
 		}));
 
-		// Insert data into MongoDB
 		await ChartData.insertMany(chartDataArray);
 		res.json({ message: "Chart data imported successfully" });
 	} catch (error) {

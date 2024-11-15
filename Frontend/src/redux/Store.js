@@ -3,7 +3,7 @@ import rootReducer from "./reducers/rootReducer";
 
 const store = configureStore({
 	reducer: rootReducer,
-	devTools: true, // Enable Redux DevTools here
+	devTools: true, 
 });
 
 export default store;

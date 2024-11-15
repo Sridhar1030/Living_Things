@@ -76,7 +76,6 @@ const ChartComponent = () => {
                     groupedData[date].algo_status === "0" ? groupedData[date].total_kwh : null
                 );
 
-                // Set the chart data with two datasets
                 setChartData({
                     labels: sortedData,
                     datasets: [
@@ -94,22 +93,20 @@ const ChartComponent = () => {
                         },
                     ],
                 });
-                setLoading(false); // Set loading to false once data is fetched
+                setLoading(false); 
             })
             .catch(err => {
                 console.error(err);
                 setLoading(false);
             });
 
-        // Cleanup chart reference on unmount
         return () => {
             if (chartRef.current) {
                 chartRef.current.destroy();
             }
         };
-    }, []); // Only run once when component is mounted
+    }, []); 
 
-    // If still loading, show the loading animation and message
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] bg-blue-900 rounded-lg">
@@ -122,7 +119,6 @@ const ChartComponent = () => {
         );
     }
 
-    // Once data is loaded, render the chart
     return (
         <div className="bg-blue-900 p-6 rounded-lg">
             <h2 className="text-2xl font-bold text-white mb-6">Energy Consumption by Date</h2>

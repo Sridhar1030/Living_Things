@@ -7,7 +7,6 @@ export const loginUser = (credentials) => async (dispatch) => {
 		const response = await axios.post("/api/login", credentials);
 		const { user, accessToken } = response.data;
 
-		// Store tokens in localStorage
 		localStorage.setItem("accessToken", accessToken);
 
 		dispatch({ type: "LOGIN_SUCCESS", payload: user });
@@ -20,7 +19,6 @@ export const loginUser = (credentials) => async (dispatch) => {
 };
 
 export const logoutUser = () => (dispatch) => {
-	// Clear tokens from localStorage
 	localStorage.clear();
 	dispatch({ type: "LOGOUT" });
 };

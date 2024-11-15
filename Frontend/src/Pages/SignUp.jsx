@@ -43,7 +43,6 @@ const Signup = () => {
 
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="rounded-md shadow-sm space-y-4">
-                        {/* Full Name Input */}
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">
                                 Full Name
@@ -60,7 +59,6 @@ const Signup = () => {
                             />
                         </div>
 
-                        {/* Email Input */}
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
                                 Email Address
@@ -77,7 +75,6 @@ const Signup = () => {
                             />
                         </div>
 
-                        {/* Username Input */}
                         <div>
                             <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
                                 Username
@@ -94,7 +91,6 @@ const Signup = () => {
                             />
                         </div>
 
-                        {/* Password Input */}
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
                                 Password

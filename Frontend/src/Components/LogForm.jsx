@@ -16,7 +16,6 @@ const LogForm = () => {
         setLoading(true);
         const API_URL = import.meta.env.VITE_API_URL;
 
-        // Set algoStatus based on energySavingMode
         const algoStatus = energySavingMode === 'Energy Saving Mode ON' ? 1 : 0;
 
         const formData = { accessTime, accessDate, employeeName, algoStatus };

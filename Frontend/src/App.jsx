@@ -23,16 +23,12 @@ const App = () => {
 
         </Routes>
 
-        {/* Main Application Layout */}
         <div className="min-h-screen">
-          {/* Navigation Header */}
           <Navbar />
 
-          {/* Main Content */}
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="rounded-xl p-6">
               <Routes>
-                {/* Dashboard Route */}
                 <Route
                   path="/dashboard"
                   element={
@@ -51,7 +47,6 @@ const App = () => {
                   }
                 />
 
-                {/* Other Routes */}
                 <Route
                   path="/log-form"
                   element={

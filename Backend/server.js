@@ -9,14 +9,12 @@ import dotenv from "dotenv";
 dotenv.config();
 const app = express();
 
-// Use cors middleware to allow cross-origin requests from all domains
 app.use(cors());
 
 app.use(express.json());
 
 connectDB();
 
-// Testing route that returns "Hello World" at the root URL
 app.get("/", (req, res) => {
     res.send("Hello World");
 });

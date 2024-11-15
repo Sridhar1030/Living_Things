@@ -6,18 +6,18 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
 		const user = await User.findById(userId);
 
 		if (!user) {
-			throw new Error("User not found"); // Ensure the user exists
+			throw new Error("User not found"); 
 		}
 
 		const accessToken = user.generateAccessToken();
 		const refreshToken = user.generateRefreshToken();
 
 		user.refreshToken = refreshToken;
-		await user.save(); // Save the user with validation
+		await user.save(); 
 
 		return { accessToken, refreshToken };
 	} catch (error) {
-		console.error(error); // Log the error for debugging
+		console.error(error); 
 		throw new Error(
 			"Something went wrong while generating refresh and access token"
 		);
@@ -100,7 +100,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
 	const options = {
 		httpOnly: true,
-		secure: process.env.NODE_ENV === "production", // Only secure in production
+		secure: process.env.NODE_ENV === "production", 
 	};
 
 	return res
