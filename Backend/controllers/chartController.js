@@ -42,16 +42,33 @@ export const getChartData = async (req, res) => {
 };
 
 
-
 export const getFilteredChartData = async (req, res) => {
     try {
-        const {  algo_status } = req.query;
+        // Check if the database is empty
+        const existingData = await ChartData.countDocuments();
+        
+        // If no data exists, import the data from the JSON file
+        if (existingData === 0) {
+            console.log('No data found, importing chart data...');
+            await importChartData(req, res); // Call the import function
+        }
+
+        // After ensuring data is in the database, filter by algo_status
+        const { algo_status, start_date, end_date } = req.query;
 
         const filter = {
-
             ...(algo_status && { algo_status: parseInt(algo_status) }) // Filter by algo_status
         };
 
+        // If date filters are provided, add them to the filter
+        if (start_date && end_date) {
+            filter.createdAt = {
+                $gte: new Date(start_date), // Start date
+                $lte: new Date(end_date)    // End date
+            };
+        }
+
+        // Fetch filtered data
         const data = await ChartData.find(filter);
 
         res.json(data);

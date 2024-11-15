@@ -14,6 +14,15 @@ const Signup = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    // Handle form input changes
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         dispatch(signupUser(formData));

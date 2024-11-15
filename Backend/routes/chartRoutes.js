@@ -9,7 +9,7 @@ import { verifyJWT } from "../middleware/auth.middlewares.js";
 const router = express.Router();
 
 router.get("/",  getChartData);
-router.post("/import",verifyJWT, importChartData);
+// router.post("/import", importChartData);
 router.get('/filtered',verifyJWT , getFilteredChartData);
 
 
