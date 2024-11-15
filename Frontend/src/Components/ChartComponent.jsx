@@ -1,18 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Bar } from 'react-chartjs-2';
 import axios from 'axios';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement } from 'chart.js';
 
 // Register necessary chart components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement);
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ChartComponent = () => {
     const [chartData, setChartData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const chartRef = React.useRef(null);
+    const [message, setMessage] = useState('Waiting for render to start');
+    const [dots, setDots] = useState('...');
+    const chartRef = useRef(null);
+
+    // Array of messages for loading
+    const messages = [
+        "Still starting...",
+        "Render is almost there...",
+        "Hold tight, we're working on it...",
+        "Hang on, just a little bit more...",
+        "Preparing the view, please wait..."
+    ];
+
+    // Effect to update the loading message and dots animation
+    useEffect(() => {
+        if (loading) {
+            const intervalId = setInterval(() => {
+                // Random message from the array
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                setMessage(randomMessage);
+
+                // Animate the dots
+                setDots(prevDots => (prevDots.length < 3 ? prevDots + '.' : '.'));
+            }, 1000);
+
+            // Clean up the interval on component unmount
+            return () => clearInterval(intervalId);
+        }
+    }, [loading]);
 
     useEffect(() => {
+        // Fetch data from API
         axios.get(`${API_URL}/charts`)
             .then(response => {
                 const data = response.data;
@@ -64,20 +94,22 @@ const ChartComponent = () => {
                         },
                     ],
                 });
-                setLoading(false);
+                setLoading(false); // Set loading to false once data is fetched
             })
             .catch(err => {
                 console.error(err);
                 setLoading(false);
             });
 
+        // Cleanup chart reference on unmount
         return () => {
             if (chartRef.current) {
                 chartRef.current.destroy();
             }
         };
-    }, []);
+    }, []); // Only run once when component is mounted
 
+    // If still loading, show the loading animation and message
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] bg-blue-900 rounded-lg">
@@ -85,11 +117,12 @@ const ChartComponent = () => {
                     <div className="w-12 h-12 border-4 border-orange-500 rounded-full animate-pulse"></div>
                     <div className="w-12 h-12 border-4 border-transparent border-t-blue-400 rounded-full animate-spin absolute top-0"></div>
                 </div>
-                <p className="mt-4 text-white text-lg font-medium">Loading Chart Data...</p>
+                <p className="mt-4 text-white text-lg font-medium">{message}{dots}</p>
             </div>
         );
     }
 
+    // Once data is loaded, render the chart
     return (
         <div className="bg-blue-900 p-6 rounded-lg">
             <h2 className="text-2xl font-bold text-white mb-6">Energy Consumption by Date</h2>
