@@ -6,21 +6,30 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
     const [emailOrUsername, setEmailOrUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false); // Add loading state
     const { error } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setLoading(true); // Set loading to true when form is submitted
+
         const credentials = {
             email: emailOrUsername.includes('@') ? emailOrUsername : undefined,
             username: !emailOrUsername.includes('@') ? emailOrUsername : undefined,
             password,
         };
-        dispatch(loginUser(credentials));
-        navigate('/dashboard');
-    };
 
+        dispatch(loginUser(credentials)) // Dispatch login action
+            .then(() => {
+                setLoading(false); // Set loading to false after successful login
+                navigate('/dashboard'); // Navigate to dashboard on success
+            })
+            .catch((err) => {
+                setLoading(false); // Set loading to false if there is an error
+            });
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -78,8 +87,13 @@ const Login = () => {
                         <button
                             type="submit"
                             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                            disabled={loading} // Disable button while loading
                         >
-                            Sign in
+                            {loading ? (
+                                <div className="spinner-border animate-spin h-5 w-5 border-t-4 border-blue-300 rounded-full"></div>
+                            ) : (
+                                'Sign in'
+                            )}
                         </button>
 
                         <button
